@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import Retell from "retell-sdk";
 
 export async function POST(request: Request) {
     try {
@@ -29,49 +30,19 @@ export async function POST(request: Request) {
             );
         }
 
-        // Call Retell API to create a web call
-        console.log("Calling Retell API...");
-        const response = await fetch(
-            "https://api.retellai.com/v1/public/web-call",
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${apiKey}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    agent_id: agentId,
-                }),
-            }
-        );
+        const client = new Retell({ apiKey: apiKey });
 
-        const responseBody = await response.text();
-        console.log("Retell API Response Status:", response.status);
-        console.log("Retell API Response Body:", responseBody);
+        console.log("Creating Retell web call...");
+        const callResp = await client.call.createWebCall({
+            agent_id: agentId,
+        });
 
-        if (!response.ok) {
-            return NextResponse.json(
-                { error: "Failed to create Retell session", details: responseBody },
-                { status: response.status }
-            );
-        }
-
-        let data;
-        try {
-            data = JSON.parse(responseBody);
-        } catch (e) {
-            console.error("Failed to parse Retell response as JSON:", e);
-            return NextResponse.json(
-                { error: "Invalid JSON response from Retell", details: responseBody },
-                { status: 500 }
-            );
-        }
-
-        console.log("Retell Session Created:", data);
+        console.log("Retell Session Created:", callResp);
 
         return NextResponse.json({
-            access_token: data.access_token, // Retell returns access_token for web client
+            access_token: callResp.access_token,
         });
+
     } catch (error) {
         console.error("Error creating Retell session:", error);
         return NextResponse.json(
