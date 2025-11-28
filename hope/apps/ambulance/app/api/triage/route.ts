@@ -22,6 +22,8 @@ export async function POST(request: Request) {
             );
         }
 
+        console.log("Received Transcript for Triage:", transcript);
+
         const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
         if (!apiKey) {
@@ -63,13 +65,30 @@ export async function POST(request: Request) {
       
       Return ONLY a JSON object with the following structure:
       {
-        "patient_name": "Name if mentioned, else null",
-        "patient_age": "Age as integer if mentioned, else null",
-        "gender": "Gender if mentioned, else null",
-        "symptoms": "Main symptoms described",
-        "summary": "Brief summary of patient condition",
-        "severity": "critical" | "moderate" | "low",
-        "suggested_actions": ["List of 3-5 concise actions for the paramedic"]
+        "patient": {
+          "name": "Name if mentioned, else null",
+          "age": "Age as integer if mentioned, else null",
+          "gender": "Gender if mentioned, else null"
+        },
+        "symptoms": ["List of main symptoms"],
+        "vitals": {
+          "bp": "Blood pressure if mentioned",
+          "pulse": "Pulse rate if mentioned",
+          "spo2": "SPO2 level if mentioned",
+          "temperature": "Temperature if mentioned",
+          "consciousness": "Alert/Confused/Unconscious",
+          "bleeding": "Description of bleeding if any"
+        },
+        "context": {
+          "incident_cause": "Cause of injury/illness",
+          "allergies": "Known allergies",
+          "pain_scale": "Pain level 0-10"
+        },
+        "ai_triage_agent_output": {
+          "summary": "Brief clinical summary",
+          "triage_level": "critical" | "moderate" | "low",
+          "suggested_actions": ["List of 3-5 concise actions"]
+        }
       }
     `;
 
@@ -127,31 +146,31 @@ export async function POST(request: Request) {
             );
         }
 
-        // Map severity to valid enum based on DB values (critical, moderate, etc.)
-        // "high" caused an error, so we map it to "critical" or "moderate".
-        // Existing DB values: critical, moderate.
+        // Map severity to valid enum based on DB values
         const severityMap: Record<string, string> = {
             "critical": "critical",
-            "high": "critical", // Map high to critical as high is not in enum
-            "medium": "moderate", // Map medium to moderate
+            "high": "critical",
+            "medium": "moderate",
             "moderate": "moderate",
-            "low": "low", // Assuming low exists
+            "low": "low",
             "minor": "low"
         };
 
-        const triageLevel = severityMap[triageData.severity?.toLowerCase()] || "moderate"; // Default fallback
+        const rawSeverity = triageData.ai_triage_agent_output?.triage_level || "moderate";
+        const triageLevel = severityMap[rawSeverity.toLowerCase()] || "moderate";
 
         const { data: emergencyData, error: emergencyError } = await supabase
             .from("emergencies")
             .insert({
                 ambulance_id: ambulanceData.id,
                 nurse_id: ambulanceData.assigned_nurse,
-                patient_name: triageData.patient_name,
-                patient_age: triageData.patient_age,
-                gender: triageData.gender,
-                symptoms: triageData.symptoms,
-                ai_summary: triageData, // Keep this for backward compatibility or general summary
-                ai_triage_agent_output: triageData, // Store specifically in the agent output column
+                patient_name: triageData.patient?.name || null,
+                patient_age: triageData.patient?.age || null,
+                gender: triageData.patient?.gender || null,
+                symptoms: Array.isArray(triageData.symptoms) ? triageData.symptoms.join(", ") : triageData.symptoms,
+                vitals: triageData.vitals,
+                ai_summary: triageData.ai_triage_agent_output, // Storing the summary object
+                ai_triage_agent_output: triageData, // Store the FULL AI output
                 triage_level: triageLevel,
                 status: 'initiated'
             })

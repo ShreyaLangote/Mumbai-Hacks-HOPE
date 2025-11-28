@@ -8,9 +8,16 @@ import { Mic, Square, Activity, AlertCircle, CheckCircle } from "lucide-react";
 
 // Define types for Triage Result
 interface TriageResult {
-    summary: string;
-    severity: "critical" | "high" | "medium" | "low";
-    suggested_actions: string[];
+    patient: {
+        name: string | null;
+        age: number | null;
+        gender: string | null;
+    };
+    ai_triage_agent_output: {
+        summary: string;
+        triage_level: "critical" | "moderate" | "low";
+        suggested_actions: string[];
+    };
 }
 
 export default function IntakePage() {
@@ -56,9 +63,9 @@ export default function IntakePage() {
             retellClient.current.on("update", (update: any) => {
                 if (update.transcript) {
                     const currentTranscript = update.transcript
-                        .filter((item: any) => item.role === 'user')
-                        .map((item: any) => item.content)
-                        .join(" ");
+                        .filter((item: any) => item.role === 'user' || item.role === 'agent')
+                        .map((item: any) => `${item.role === 'agent' ? 'Nurse Assistant' : 'Paramedic'}: ${item.content}`)
+                        .join("\n");
                     setTranscript(currentTranscript);
                 }
             });
@@ -199,7 +206,7 @@ export default function IntakePage() {
                 {/* Transcript Area */}
                 <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 min-h-[150px]">
                     <h3 className="text-sm font-semibold text-zinc-500 mb-3 uppercase tracking-wider">Live Transcript</h3>
-                    <div className="text-lg text-zinc-200 leading-relaxed">
+                    <div className="text-lg text-zinc-200 leading-relaxed whitespace-pre-wrap">
                         {transcript || <span className="text-zinc-600 italic">No speech detected yet...</span>}
                     </div>
                 </div>
@@ -226,34 +233,33 @@ export default function IntakePage() {
                 </button>
 
                 {/* Triage Result */}
-                {triageResult && (
+                {triageResult && triageResult.ai_triage_agent_output && (
                     <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className={`
                     p-4 border-b border-zinc-800 flex justify-between items-center
-                    ${triageResult.severity === 'critical' ? 'bg-red-900/30 text-red-400' :
-                                triageResult.severity === 'high' ? 'bg-orange-900/30 text-orange-400' :
-                                    triageResult.severity === 'medium' ? 'bg-yellow-900/30 text-yellow-400' :
-                                        'bg-green-900/30 text-green-400'}
+                    ${triageResult.ai_triage_agent_output.triage_level === 'critical' ? 'bg-red-900/30 text-red-400' :
+                                triageResult.ai_triage_agent_output.triage_level === 'moderate' ? 'bg-yellow-900/30 text-yellow-400' :
+                                    'bg-green-900/30 text-green-400'}
                 `}>
                             <h3 className="font-bold text-lg flex items-center gap-2">
                                 <Activity className="w-5 h-5" />
                                 AI Triage Analysis
                             </h3>
                             <span className="px-3 py-1 rounded-full text-xs font-bold uppercase border border-current bg-black/20">
-                                {triageResult.severity} Severity
+                                {triageResult.ai_triage_agent_output.triage_level} Severity
                             </span>
                         </div>
 
                         <div className="p-6 space-y-6">
                             <div>
                                 <h4 className="text-sm text-zinc-500 mb-2 uppercase font-semibold">Patient Summary</h4>
-                                <p className="text-zinc-200">{triageResult.summary}</p>
+                                <p className="text-zinc-200">{triageResult.ai_triage_agent_output.summary}</p>
                             </div>
 
                             <div>
                                 <h4 className="text-sm text-zinc-500 mb-2 uppercase font-semibold">Suggested Actions</h4>
                                 <ul className="space-y-2">
-                                    {triageResult.suggested_actions.map((action, idx) => (
+                                    {triageResult.ai_triage_agent_output.suggested_actions.map((action, idx) => (
                                         <li key={idx} className="flex items-start gap-3 text-zinc-300">
                                             <CheckCircle className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                                             <span>{action}</span>
