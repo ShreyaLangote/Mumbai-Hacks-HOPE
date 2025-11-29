@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-// Mock function for demo - replace with your actual import
-const saveDeviceToken = (token: string) => {
-    localStorage.setItem('device_token', token);
-};
+import { saveDeviceToken } from "../../lib/device";
 
 export default function Activate() {
     const [number, setNumber] = useState("");
@@ -31,11 +27,6 @@ export default function Activate() {
             const data = await res.json();
 
             if (data.device_token) {
-                // Save token to cookies
-
-                document.cookie = `device_token=${data.device_token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
-
-
                 saveDeviceToken(data.device_token);
                 setMessage("Activated! You can now use HOPE 🚑");
 
@@ -121,20 +112,20 @@ export default function Activate() {
 
                     <button
                         className={`w-full rounded-2xl px-4 py-4 text-lg font-semibold text-white transition-all duration-200 shadow-lg ${isLoading
-                                ? "cursor-not-allowed bg-slate-300 shadow-none"
-                                : "bg-gradient-to-r from-indigo-500 via-indigo-500 to-indigo-400 hover:shadow-indigo-200"
+                            ? "cursor-not-allowed bg-slate-300 shadow-none"
+                            : "bg-gradient-to-r from-indigo-500 via-indigo-500 to-indigo-400 hover:shadow-indigo-200"
                             }`}
                         onClick={activate}
                         disabled={isLoading}
                     >
                         {isLoading ? (
-                                <span className="flex items-center justify-center gap-3">
-                                    <svg className="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                    </svg>
-                                    Activating...
-                                </span>
+                            <span className="flex items-center justify-center gap-3">
+                                <svg className="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                                Activating...
+                            </span>
                         ) : (
                             "Activate Device"
                         )}
@@ -142,8 +133,8 @@ export default function Activate() {
 
                     {message && (
                         <div className={`rounded-2xl border p-4 text-sm font-medium ${message.includes("Activated")
-                                ? "border-emerald-100 bg-emerald-50/80 text-emerald-700"
-                                : "border-rose-100 bg-rose-50/80 text-rose-700"
+                            ? "border-emerald-100 bg-emerald-50/80 text-emerald-700"
+                            : "border-rose-100 bg-rose-50/80 text-rose-700"
                             }`}>
                             <div className="flex items-start gap-3">
                                 {message.includes("Activated") ? (

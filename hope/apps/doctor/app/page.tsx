@@ -306,26 +306,51 @@ export default function DoctorDashboard() {
                     {aiSummary}
                   </div>
 
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                        Suggested actions
-                      </p>
-                      <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                        {suggestedActions.length ? (
-                          suggestedActions.map((action, idx) => (
-                            <li
-                              key={`${item.id}-action-${idx}`}
-                              className="flex items-start gap-2 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
-                            >
-                              <span className="mt-1 h-2 w-2 rounded-full bg-indigo-400" />
-                              <span>{action}</span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="text-slate-400">No actions provided.</li>
-                        )}
-                      </ul>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                      Suggested actions
+                    </p>
+                    <ul className="mt-3 space-y-2 text-sm text-slate-600">
+                      {suggestedActions.length ? (
+                        suggestedActions.map((action, idx) => (
+                          <li
+                            key={`${item.id}-action-${idx}`}
+                            className="flex items-start gap-2 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
+                          >
+                            <span className="mt-1 h-2 w-2 rounded-full bg-indigo-400" />
+                            <span>{action}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-slate-400">No actions provided.</li>
+                      )}
+                    </ul>
+                  </div>
+
+                  {item.video_room_url && (
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-3">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-400">
+                          Live call ready
+                        </p>
+                        <p className="text-xs text-indigo-600">
+                          Ambulance is waiting in a Daily.co room.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          window.open(
+                            item.video_room_url as string,
+                            "_blank",
+                            "noopener,noreferrer"
+                          )
+                        }
+                        className="rounded-full bg-indigo-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-600"
+                      >
+                        Join room
+                      </button>
                     </div>
+                  )}
 
                   {item.ai_routing_agent_output?.reasoning && (
                     <div className="border-l-2 border-indigo-100 pl-3 text-xs italic text-slate-400">

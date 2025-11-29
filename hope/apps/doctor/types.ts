@@ -11,6 +11,7 @@ export interface Emergency {
   created_at: string;
   ambulance_id: string | null;
   doctor_id: string | null;
+  video_room_url: string | null;
   ai_summary?: {
     summary?: string;
   } | null;

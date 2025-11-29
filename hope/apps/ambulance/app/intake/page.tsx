@@ -18,6 +18,7 @@ interface TriageResult {
         triage_level: "critical" | "moderate" | "low";
         suggested_actions: string[];
     };
+    emergency_id?: string;
 }
 
 export default function IntakePage() {
@@ -25,8 +26,10 @@ export default function IntakePage() {
     const [transcript, setTranscript] = useState("");
     const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
     const [loading, setLoading] = useState(false);
+    const [connecting, setConnecting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [deviceToken, setDeviceToken] = useState<string | null>(null);
+    const [emergencyId, setEmergencyId] = useState<string | null>(null);
 
     const retellClient = useRef<RetellWebClient | null>(null);
 
@@ -82,6 +85,7 @@ export default function IntakePage() {
         setError(null);
         setTriageResult(null);
         setTranscript("");
+        setEmergencyId(null);
 
         if (!deviceToken) {
             setError("Device token missing.");
@@ -145,12 +149,49 @@ export default function IntakePage() {
 
             const data = await response.json();
             setTriageResult(data);
+            setEmergencyId(data.emergency_id ?? null);
 
         } catch (err: any) {
             console.error(err);
             setError(err.message || "Failed to generate report");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleConnectDoctorLive = async () => {
+        if (!triageResult || !emergencyId) return;
+        if (!deviceToken) {
+            setError("Device token missing. Please re-activate this ambulance.");
+            return;
+        }
+
+        setError(null);
+        setConnecting(true);
+        try {
+            const response = await fetch("/api/emergencies/live", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "device_token": deviceToken,
+                },
+                body: JSON.stringify({ emergency_id: emergencyId }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to start live consult");
+            }
+
+            if (data.video_room_url) {
+                window.open(data.video_room_url, "_blank", "noopener,noreferrer");
+            }
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || "Failed to start live consult");
+        } finally {
+            setConnecting(false);
         }
     };
 
@@ -304,6 +345,22 @@ export default function IntakePage() {
                                             </li>
                                         ))}
                                     </ul>
+                                </div>
+
+                                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                                    <p className="text-xs text-slate-500">
+                                        Need a live specialist consult from the ambulance?
+                                    </p>
+                                    <button
+                                        onClick={handleConnectDoctorLive}
+                                        disabled={connecting || !emergencyId}
+                                        className={`rounded-full px-4 py-2 text-xs font-semibold transition ${connecting || !emergencyId
+                                                ? "cursor-not-allowed bg-slate-200 text-slate-400"
+                                                : "bg-gradient-to-r from-indigo-500 to-sky-500 text-white shadow-sm hover:shadow-md"
+                                            }`}
+                                    >
+                                        {connecting ? "Connecting doctor..." : "Connect Doctor Live"}
+                                    </button>
                                 </div>
                             </div>
                         ) : (
