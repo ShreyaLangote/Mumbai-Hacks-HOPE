@@ -35,7 +35,8 @@ export default function DoctorAssignment({ emergency }: { emergency: Emergency }
             if (res.ok) {
                 setAssignedDoctor(doctorId);
             } else {
-                console.error("Failed to assign doctor");
+                const errorData = await res.json();
+                console.error("Failed to assign doctor:", errorData);
             }
         } catch (e) {
             console.error(e);
@@ -45,9 +46,9 @@ export default function DoctorAssignment({ emergency }: { emergency: Emergency }
     };
 
     if (assignedDoctor) {
-        const doctor = doctors.find(d => d.id === assignedDoctor);
+        const doctor = doctors.find((d) => d.id === assignedDoctor);
         return (
-            <div className="flex items-center gap-2 text-green-400 text-sm font-medium bg-green-900/20 px-3 py-1.5 rounded-full w-fit">
+            <div className="flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/80 px-3 py-1.5 text-sm font-medium text-emerald-600">
                 <Check className="w-4 h-4" />
                 Assigned to Dr. {doctor?.full_name || "Unknown"}
             </div>
@@ -56,18 +57,18 @@ export default function DoctorAssignment({ emergency }: { emergency: Emergency }
 
     return (
         <div className="mt-4">
-            <h4 className="text-sm text-zinc-500 mb-2 font-medium">Assign Doctor</h4>
+            <h4 className="mb-2 text-sm font-medium text-slate-500">Available doctor</h4>
             <div className="flex flex-wrap gap-2">
                 {doctors.map((doctor) => (
                     <button
                         key={doctor.id}
                         onClick={() => assignDoctor(doctor.id)}
                         disabled={loading}
-                        className="flex items-center gap-2 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors border border-zinc-700"
+                        className="flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-2 text-sm text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-200 hover:text-slate-800 disabled:opacity-60"
                     >
-                        <UserPlus className="w-4 h-4 text-zinc-400" />
-                        <span className="text-zinc-200">Dr. {doctor.full_name}</span>
-                        <span className="text-xs text-zinc-500">({doctor.specialization})</span>
+                        <UserPlus className="w-4 h-4 text-indigo-400" />
+                        <span>Dr. {doctor.full_name}</span>
+                        <span className="text-xs text-slate-400">({doctor.specialization})</span>
                     </button>
                 ))}
             </div>

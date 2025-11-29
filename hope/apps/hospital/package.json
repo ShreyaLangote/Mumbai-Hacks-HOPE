@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@repo/lib": "workspace:*",
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",

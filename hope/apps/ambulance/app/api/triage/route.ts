@@ -152,8 +152,7 @@ export async function POST(request: Request) {
             "high": "critical",
             "medium": "moderate",
             "moderate": "moderate",
-            "low": "low",
-            "minor": "low"
+
         };
 
         const rawSeverity = triageData.ai_triage_agent_output?.triage_level || "moderate";

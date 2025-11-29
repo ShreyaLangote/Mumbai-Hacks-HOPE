@@ -1,26 +1,129 @@
 @import "tailwindcss";
 
+/* --------------------------
+   LIGHT INDIGO + WHITE THEME
+--------------------------- */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1e1b4b;
+  /* deep indigo text */
+
+  /* Indigo palette */
+  --primary: #4f46e5;
+  /* indigo-600 */
+  --primary-foreground: #ffffff;
+
+  --secondary: #6366f1;
+  /* indigo-500 */
+  --secondary-foreground: #ffffff;
+
+  --accent: #818cf8;
+  /* indigo-400 */
+  --accent-foreground: #ffffff;
+
+  --muted: #e0e7ff;
+  /* indigo-100 */
+  --muted-foreground: #4338ca;
+  /* indigo-700 */
+
+  --card: #ffffff;
+  --card-foreground: #1e1b4b;
+
+  --popover: #ffffff;
+  --popover-foreground: #1e1b4b;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #c7d2fe;
+  /* indigo-200 */
+  --input: #c7d2fe;
+  --ring: #4f46e5;
+
+  --radius: 0.5rem;
 }
 
+/* Tailwind Theme Mapping */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
 }
 
+/* ------------------------------
+   FORCE LIGHT THEME ALL TIME
+------------------------------ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #1e1b4b;
+
+    --card: #ffffff;
+    --card-foreground: #1e1b4b;
+
+    --popover: #ffffff;
+    --popover-foreground: #1e1b4b;
+
+    --primary: #4f46e5;
+    --primary-foreground: #ffffff;
+
+    --secondary: #6366f1;
+    --secondary-foreground: #ffffff;
+
+    --muted: #e0e7ff;
+    --muted-foreground: #4338ca;
+
+    --accent: #818cf8;
+    --accent-foreground: #ffffff;
+
+    --border: #c7d2fe;
+    --input: #c7d2fe;
+    --ring: #4f46e5;
   }
 }
 
+/* Global Styling */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glass Utility */
+.glass-panel {
+  background: rgba(79, 70, 229, 0.15);
+  /* indigo tint */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(79, 70, 229, 0.3);
+  border-radius: var(--radius-lg);
 }

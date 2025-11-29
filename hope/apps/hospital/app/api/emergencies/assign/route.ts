@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
+import { createSupabaseAdminClient } from "../../../../supabase/createAdmin";
 
 export async function POST(request: Request) {
     try {
@@ -12,11 +12,13 @@ export async function POST(request: Request) {
             .eq("id", emergencyId);
 
         if (error) {
+            console.error("Supabase update error:", error);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        console.error("Assign doctor error:", error);
+        return NextResponse.json({ error: "Internal Server Error", details: String(error) }, { status: 500 });
     }
 }
